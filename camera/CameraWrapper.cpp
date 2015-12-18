@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, The Android Open Source Project
+ * Copyright (C) 2015, The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,18 @@
 #include <hardware/hardware.h>
 #include <hardware/camera.h>
 #include <camera/Camera.h>
-#include <camera/CameraParameters2.h>
+#include <camera/CameraParameters.h>
 
 static android::Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
 
 static char **fixed_set_params = NULL;
+static char KEY_QC_MORPHO_HDR[] = "morpho-hdr";
 
 static int camera_device_open(const hw_module_t *module, const char *name,
         hw_device_t **device);
 static int camera_get_number_of_cameras(void);
 static int camera_get_camera_info(int camera_id, struct camera_info *info);
-static int camera_send_command(struct camera_device * device, int32_t cmd,
-                int32_t arg1, int32_t arg2);
 
 static struct hw_module_methods_t camera_module_methods = {
     .open = camera_device_open
@@ -56,7 +55,7 @@ camera_module_t HAL_MODULE_INFO_SYM = {
          .hal_api_version = HARDWARE_HAL_API_VERSION,
          .id = CAMERA_HARDWARE_MODULE_ID,
          .name = "Cancro Camera Wrapper",
-         .author = "The Android Open Source Project",
+         .author = "The CyanogenMod Project",
          .methods = &camera_module_methods,
          .dso = NULL, /* remove compilation warnings */
          .reserved = {0}, /* remove compilation warnings */
@@ -66,8 +65,8 @@ camera_module_t HAL_MODULE_INFO_SYM = {
     .set_callbacks = NULL, /* remove compilation warnings */
     .get_vendor_tag_ops = NULL, /* remove compilation warnings */
     .open_legacy = NULL, /* remove compilation warnings */
-    .set_torch_mode = NULL,
-    .init = NULL,
+    .set_torch_mode = NULL, /* remove compilation warnings */
+    .init = NULL, /* remove compilation warnings */
     .reserved = {0}, /* remove compilation warnings */
 };
 
@@ -123,8 +122,7 @@ static char *camera_fixup_getparams(int id __attribute__((unused)),
 
 static char *camera_fixup_setparams(int id, const char *settings)
 {
-    bool videoMode = false;
-    bool hdrMode = false;
+    bool XiaomiHDR = false;
 
     android::CameraParameters params;
     params.unflatten(android::String8(settings));
@@ -134,27 +132,16 @@ static char *camera_fixup_setparams(int id, const char *settings)
     params.dump();
 #endif
 
-    if (params.get(android::CameraParameters::KEY_RECORDING_HINT)) {
-        videoMode = !strcmp(params.get(android::CameraParameters::KEY_RECORDING_HINT), "true");
-    }
+    params.set(android::CameraParameters::KEY_VIDEO_STABILIZATION, "false");
 
     if (params.get(android::CameraParameters::KEY_SCENE_MODE)) {
-        hdrMode = (!strcmp(params.get(android::CameraParameters::KEY_SCENE_MODE), "hdr"));
+        XiaomiHDR = (!strcmp(params.get(android::CameraParameters::KEY_SCENE_MODE), "hdr"));
     }
-
-    /* Disable ZSL and HDR snapshots in video mode */
-    if (videoMode) {
-        params.set("zsl", "off");
-        if (hdrMode) {
-            params.set(android::CameraParameters::KEY_SCENE_MODE, "auto");
-        }
-    } else {
-        params.set("zsl", "on");
-    }
-
-    /* Disable flash in HDR mode */
-    if (hdrMode && !videoMode) {
+    if (XiaomiHDR) {
+        params.set(KEY_QC_MORPHO_HDR, "true");
         params.set(android::CameraParameters::KEY_FLASH_MODE, android::CameraParameters::FLASH_MODE_OFF);
+    } else {
+        params.set(KEY_QC_MORPHO_HDR, "false");
     }
 
 #if !LOG_NDEBUG
@@ -560,7 +547,7 @@ static int camera_device_open(const hw_module_t *module, const char *name,
         memset(camera_ops, 0, sizeof(*camera_ops));
 
         camera_device->base.common.tag = HARDWARE_DEVICE_TAG;
-        camera_device->base.common.version = HARDWARE_DEVICE_API_VERSION(1, 0);
+        camera_device->base.common.version = CAMERA_DEVICE_API_VERSION_1_0;
         camera_device->base.common.module = (hw_module_t *)(module);
         camera_device->base.common.close = camera_device_close;
         camera_device->base.ops = camera_ops;
