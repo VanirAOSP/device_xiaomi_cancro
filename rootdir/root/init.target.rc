@@ -69,13 +69,16 @@ on post-fs-data
     chown system camera /sys/class/leds/torch-light/brightness
     chmod 0660 /sys/class/leds/torch-light/brightness
 
-    # Vibrator permissions
-    chown system system /sys/vibrator/pwmvalue
-    chmod 0644 /sys/vibrator/pwmvalue
-
     # Dynamic FPS
     chown system graphics /sys/class/graphics/fb0/dynamic_fps
-    chmod 0664 /sys/class/graphics/fb0/dynamic_fps
+    chmod 0644 /sys/class/graphics/fb0/dynamic_fps
+    # Adjust vibrator amplitude
+    write /sys/class/timed_output/vibrator/amp 95
+
+    # VibratorHW
+    chown root system /sys/class/timed_output/vibrator/amp
+    chmod 0664 /sys/class/timed_output/vibrator/amp
+    restorecon /sys/class/timed_output/vibrator/amp
 
     #  KeyDisabler
     chown root system /sys/bus/i2c/drivers/atmel_mxt_ts/2-004a/keys_off
@@ -99,27 +102,10 @@ on post-fs-data
     chmod 0664 /sys/bus/i2c/drivers/atmel_mxt_ts_640t/2-004b/stylus
     restorecon /sys/bus/i2c/drivers/atmel_mxt_ts_640t/2-004b/stylus
 
-    # Enable writing to led blink node from userspace
-    chown system system /sys/class/leds/button-backlight/brightness
-    chown system system /sys/class/leds/button-backlight1/brightness
-    chown system system /sys/class/leds/red/blink
-    chown system system /sys/class/leds/red/duty_pcts
-    chown system system /sys/class/leds/red/ramp_step_ms
-    chown system system /sys/class/leds/green/blink
-    chown system system /sys/class/leds/green/duty_pcts
-    chown system system /sys/class/leds/green/ramp_step_ms
-    chown system system /sys/class/leds/blue/blink
-    chown system system /sys/class/leds/blue/duty_pcts
-    chown system system /sys/class/leds/blue/ramp_step_ms
-
-    chown system system /sys/class/graphics/fb0/aco
-    chown system system /sys/class/graphics/fb0/cabc
-    chown system system /sys/class/graphics/fb0/rgb
-    chown system system /sys/class/graphics/fb0/sre
-    chmod 0664 /sys/class/graphics/fb0/aco
-    chmod 0664 /sys/class/graphics/fb0/cabc
-    chmod 0664 /sys/class/graphics/fb0/rgb
-    chmod 0664 /sys/class/graphics/fb0/sre
+    # RBG calibration
+    chown system system /sys/devices/virtual/graphics/fb0/rgb
+    chmod 0660 /sys/devices/virtual/graphics/fb0/rgb
+    restorecon /sys/devices/virtual/graphics/fb0/rgb
 
 on boot
     chown system system /sys/class/input/input0/enabled
@@ -178,12 +164,6 @@ service qcamerasvr /system/bin/mm-qcamera-daemon
     class late_start
     user camera
     group camera system inet input graphics
-
-#start GNSS/Sensor interface daemon
-service gsiff_daemon /system/bin/gsiff_daemon
-    class late_start
-    user gps
-    group gps net_raw misc
 
 service qrngd /system/bin/qrngd -f
     class main
@@ -256,7 +236,7 @@ service imsdatadaemon /system/bin/imsdatadaemon
 service wcnss-service /system/bin/wcnss_service
     class main
     user system
-    group system wifi
+    group system wifi radio
     oneshot
 
 service sysmatsir /system/bin/smonsir

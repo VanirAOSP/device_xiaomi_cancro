@@ -80,29 +80,20 @@ void init_msm_properties(unsigned long msm_id, unsigned long msm_ver, char *boar
         raw_id = strtoul(tmp, NULL, 0);
     }
 
-    /* MI 3W  */
-    if (raw_id==1978) {
-        property_set("ro.product.model", "MI 3W");
-    } else
+    property_set("ro.product.device", "cancro");
+    property_set("ro.build.fingerprint", "Xiaomi/cancro/cancro:6.0.1/MMB29M/6.1.21:userdebug/test-keys");
+    property_set("ro.build.description", "cancro-userdebug 6.0.1 MMB29M 6.1.21 test-keys");
 
-    /* MI 4W  */
-    if (raw_id==1974) {
-        property_set("ro.product.model", "MI 4W");
-        property_set("ro.telephony.default_network", "10");
-        property_set("ro.ril.def.preferred.network", "10");
-        property_set("telephony.lteOnGSMDevice", "1");
-    } else
-
-    /* MI 4LTE-CU  */
-    if (raw_id==1972) {
-        property_set("ro.product.model", "MI 4LTE");
-        property_set("ro.product.name", "cancro_wc_lte");
-        property_set("ro.telephony.default_network", "8");
-        property_set("telephony.lteOnGSMDevice", "1");
-    }
-
-    /* ??? */
-    else {
-        property_set("ro.product.model", "MI 3/4"); // this should never happen.
+    switch (raw_id) {
+        case 1978:
+            property_set("ro.product.model", "MI 3W");
+            break;
+        case 1974:
+            property_set("ro.product.model", "MI 4");
+            break;
+        default:
+            // Other unsupported variants
+            property_set("ro.product.model", "Unsupported MI Cancro");
+            break;
     }
 }
