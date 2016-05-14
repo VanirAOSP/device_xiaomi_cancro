@@ -1,4 +1,5 @@
 #============= qti_init_shell ==============
+allow qti_init_shell btnvtool_exec:file { read open getattr execute execute_no_trans };
 allow qti_init_shell ctl_default_prop:property_service set;
 allow qti_init_shell persist_file:dir setattr;
 allow qti_init_shell sensors_data_file:dir { setattr write add_name };
