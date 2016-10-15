@@ -22,6 +22,7 @@ TARGET_RELEASETOOLS_EXTENSIONS := $(CANCRO_PATH)/releasetools
 TARGET_RECOVERY_UPDATER_LIBS := librecovery_updater_cancro
 
 TARGET_BOARD_INFO_FILE ?= $(CANCRO_PATH)/board-info.txt
+
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := MSM8974
 TARGET_NO_BOOTLOADER         := true
@@ -30,8 +31,6 @@ TARGET_NO_RADIOIMAGE         := true
 # Platform
 TARGET_BOARD_PLATFORM     := msm8974
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno330
-
-USE_CLANG_PLATFORM_BUILD := true
 
 # Architecture
 TARGET_ARCH         := arm
@@ -42,8 +41,8 @@ TARGET_CPU_SMP      := true
 TARGET_CPU_VARIANT  := krait
 
 # Flags
-COMMON_GLOBAL_CFLAGS   += -D__ARM_USE_PLD -D__ARM_CACHE_LINE_SIZE=64 -DUSE_RIL_VERSION_10
-COMMON_GLOBAL_CPPFLAGS += -DUSE_RIL_VERSION_10
+BOARD_GLOBAL_CFLAGS   += -D__ARM_USE_PLD -D__ARM_CACHE_LINE_SIZE=64 -DUSE_RIL_VERSION_10
+BOARD_GLOBAL_CPPFLAGS += -DUSE_RIL_VERSION_10
 
 # Kernel
 BOARD_KERNEL_CMDLINE               := console=none vmalloc=340M androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x37 ehci-hcd.park=3 androidboot.selinux=permissive
@@ -105,6 +104,7 @@ MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 
 # Camera
+TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 
 # Wifi
@@ -136,6 +136,7 @@ BOARD_FLASH_BLOCK_SIZE              := 131072
 
 # Recovery
 RECOVERY_FSTAB_VERSION             := 2
+TARGET_RECOVERY_DENSITY            := xhdpi
 TARGET_RECOVERY_FSTAB              := $(CANCRO_PATH)/rootdir/root/fstab.qcom
 TARGET_RECOVERY_PIXEL_FORMAT       := "RGBX_8888"
 TARGET_RECOVERY_LCD_BACKLIGHT_PATH := \"/sys/class/leds/lcd-backlight/brightness\"
@@ -155,9 +156,6 @@ TARGET_PROVIDES_GPS_LOC_API := true
 
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
-
-# Use HW crypto for ODE
-TARGET_HW_DISK_ENCRYPTION := false
 
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
@@ -189,3 +187,4 @@ BOARD_SEPOLICY_DIRS += \
         $(CANCRO_PATH)/sepolicy
 
 -include vendor/xiaomi/cancro/BoardConfigVendor.mk
+-include vendor/qcom/binaries/msm8974/graphics/BoardConfigVendor.mk
