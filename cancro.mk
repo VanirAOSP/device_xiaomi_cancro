@@ -43,6 +43,10 @@ PRODUCT_PACKAGES += \
     libxml2 \
     Snap
 
+# Charger
+PRODUCT_PACKAGES += \
+    charger_res_images
+
 # Lights
 PRODUCT_PACKAGES += \
     lights.msm8974
@@ -269,3 +273,4 @@ $(call inherit-product, frameworks/native/build/phone-xxhdpi-2048-hwui-memory.mk
 
 # call the proprietary setup
 $(call inherit-product, vendor/xiaomi/cancro/cancro-vendor.mk)
+$(call inherit-product, vendor/qcom/binaries/msm8974/graphics/graphics-vendor.mk)
