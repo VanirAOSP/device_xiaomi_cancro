@@ -104,8 +104,9 @@ MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 
 # Camera
+TARGET_HAS_LEGACY_CAMERA_HAL1          := true
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
-USE_DEVICE_SPECIFIC_CAMERA := true
+USE_DEVICE_SPECIFIC_CAMERA             := true
 
 # Wifi
 BOARD_HAS_QCOM_WLAN              := true
@@ -168,6 +169,7 @@ BOARD_USES_QC_TIME_SERVICES := true
 
 # Charger
 BOARD_CHARGER_ENABLE_SUSPEND := true
+BOARD_CHARGER_DISABLE_INIT_BLANK := true
 
 # Enable dex-preoptimization to speed up first boot sequence
 ifeq ($(HOST_OS),linux)
